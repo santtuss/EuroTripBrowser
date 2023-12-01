@@ -1,0 +1,6 @@
+lightblue #84DBFF
+blue #54C0EB
+red #FF7058
+yellow #FFD15C
+darkgrey #40596B
+green #4CDBC4
