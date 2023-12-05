@@ -6,10 +6,21 @@
 
   <link href="style.css" rel="stylesheet"/>
   <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
+  <script src="eurotrip.js" defer></script>
 </head>
+
 <body>
   <header><h2>EuroTrip</h2></header>
   <main>
+
+    <dialog open id="nameinput">
+      <form id="name-form">
+        <label for="name-input">Insert Your Name<br>
+        </label><input type="text" id="name-input" required><br>
+        <input type="submit" value="New Game">
+      </form>
+    </dialog>
+
     <div id="map">map</div>
     <div class="boxes">
     <section>
@@ -18,13 +29,13 @@
         <li>range</li>
         <li>stamps</li>
       </ul>
-      <p>player name<br>
-      current location<br>
-      goal</p>
+      <p id="p_name">player name</p>
+      <p>location</p>
+      <p>goal</p>
     </section>
     <section>
       <ul>
-        <li class="button1"><img class="icon" src="image/travel.svg" alt="travel button"></li>
+        <li class="button1" id="travel_button"><img class="icon" src="image/travel.svg" alt="travel button"></li>
         <li class="button1"><img class="icon" src="image/shop.svg" alt="shop button"></li>
         <li class="button1"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
       </ul>

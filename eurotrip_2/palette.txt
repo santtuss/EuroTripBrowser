@@ -1,0 +1,14 @@
+lightblue #84DBFF
+blue #54C0EB
+red #FF7058
+yellow #FFD15C
+darkgrey #40596B
+green #4CDBC4
+
+
+
+button.addEventListener('click', async function(){
+  const response = await fetch('http://127.0.0.1:3000/get_encounters');
+  const result = await response.json();
+  document.querySelector('#map').innerHTML = result[0]['effect']
+});
