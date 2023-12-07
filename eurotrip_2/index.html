@@ -7,13 +7,14 @@
   <link href="style.css" rel="stylesheet"/>
   <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
   <script src="eurotrip.js" defer></script>
+  <script type='text/javascript' src='http://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=AigplY5Gt6GAX6r1msmp9nIvgNrinvR-PAW7edpDi279Vp5KEr0aPguKrcWX1G9H&setMkt=en-GB&setLang=en' async defer></script>
 </head>
 
 <body>
   <header><h2>EuroTrip</h2></header>
   <main>
 
-    <dialog open id="nameinput">
+    <dialog id="nameinput">
       <form id="name-form">
         <label for="name-input">Insert Your Name<br>
         </label><input type="text" id="name-input" required><br>
@@ -21,7 +22,7 @@
       </form>
     </dialog>
 
-    <div id="map">map</div>
+    <div id="map"></div>
     <div class="boxes">
     <section>
       <ul>
