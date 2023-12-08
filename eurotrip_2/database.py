@@ -5,11 +5,11 @@ import mysql.connector
 class Database:
     def __init__(self):
         self.conn = mysql.connector.connect(
-            host='localhost',
+            host='mysql.metropolia.fi',
             port=3306,
-            database='demogame',
-            user='root',
-            password='5pöpö!',
+            database='santtuss',
+            user='santtuss',
+            password='1234',
             autocommit=True
         )
 
