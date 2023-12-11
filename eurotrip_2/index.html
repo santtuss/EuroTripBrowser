@@ -23,26 +23,42 @@
       </form>
     </dialog>
 
+
+    <dialog id="shopDialog">
+      <p>Do you want to buy range?</p>
+      <button id="buyRangeButton">Yes</button>
+      <button id="cancelBuyButton">No</button>
+    </dialog>
+
+    <dialog id="rangeAmountDialog">
+      <p>Enter range amount:</p>
+      <label for="rangeAmount">Amount:</label>
+      <input type="number" id="rangeAmount" min="1" required><br>
+      <button id="confirmBuyButton">Confirm</button>
+      <button id="cancelBuyButton2">Cancel</button>
+    </dialog>
+
+
     <div id="map"></div>
     <div class="boxes">
     <section>
       <ul>
-        <li>money</li>
-        <li>range</li>
+        <li id="moneyfield"></li>
+        <li id="rangefield"></li>
         <li>stamps</li>
       </ul>
       <p id="p_name">player name</p>
-      <p>location</p>
+      <p id="p_location">location</p>
       <p>goal</p>
     </section>
     <section>
       <ul>
         <li class="button1" id="travel_button"><img class="icon" src="image/travel.svg" alt="travel button"></li>
-        <li class="button1"><img class="icon" src="image/shop.svg" alt="shop button"></li>
-        <li class="button1"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
+        <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button"></li>
+        <li class="button3"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
       </ul>
     </section>
-    <section>where</section>
+      <section>Visited airports: <br><select id="visited_dropdown"></select></section>
     </div>
   </main>
   <footer>footer</footer>

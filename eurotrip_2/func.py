@@ -42,7 +42,8 @@ def get_airport_info(icao):
     return result
 
 
-# argumentteina game id ja sijainti, palauttaa joko 1 jos on käyty ja 0 jos ei ole käyty
+# argumentteina game id ja sijainti
+# palauttaa json rivin -> "visited": False/True
 @app.route('/check_if_visited/<game_id>/<current_location>')
 def check_if_visited(game_id, current_location):
     sql = f'SELECT EXISTS(SELECT * from visited_city WHERE id_game = %s AND location = %s)'
@@ -55,7 +56,10 @@ def check_if_visited(game_id, current_location):
     elif result == 1:
         return {"visited": True}
 
-
+# päivittää visited statuksen
+# palauttaa json ->
+# "location": location (annettu sijainti)
+# "visited": 1
 @app.route('/update_visited_status/<game_id>/<location>')
 def update_visited_status(game_id, location):
     already_visited = check_if_visited(game_id, location)["visited"]
@@ -68,7 +72,8 @@ def update_visited_status(game_id, location):
     return {"location": location, "visited": 1}
 
 
-# argumenttina sijainti, palauttaa 1 (jos kohteessa on leima) tai 0 (jos ei ole)
+# argumenttina sijainti, palauttaa json
+# "has_goal": True/False
 @app.route('/check_if_goal/<player_location>')
 def check_if_goal(player_location):
     check = False
@@ -82,8 +87,9 @@ def check_if_goal(player_location):
     return {"has_goal": check}
 
 
-# argumentteina game id ja sijainti, palauttaa 0 jos ei ole random_encounteria
-# 1 jos on ja 2 jos kohteessa on käyty jo
+# argumentteina game id ja sijainti palauttaa json
+# "has_re": True/False
+# false myös silloin jos on käyty jo vaikka on ollut aiemmin
 @app.route('/check_if_re/<game_id>/<player_location>')
 def check_if_re(game_id, player_location):
     re_status = False
@@ -101,7 +107,9 @@ def check_if_re(game_id, player_location):
 
 
 # argumentteina game id ja sijainti, palauttaa 0 jos ei ole random encounteria/on käyty jo
-# palauttaa random encounterin idn ("el_encounter") jos sellainen on paikassa
+# palauttaa random encounterin idn ("el_encounter") paikassa json muodossa
+# "re_id": numero
+# ("re_id": 0 jos ei ole random encounteria)
 @app.route('/check_which_re/<game_id>/<location>')
 def check_which_re(game_id, location):
     if check_if_re(game_id, location)["has_re"]:
@@ -117,6 +125,7 @@ def check_which_re(game_id, location):
 
 # argumentit player name ja aloitussijainti
 # palauttaa automaattisesti luodun game id + päivittää databaseen uuden pelin tiedot
+# "game_id": g_id
 @app.route('/create_game/<p_name>/<start_location>')
 def create_game(p_name, start_location):
     sql = (f'''INSERT INTO game (money_budget, range_budget, location, screen_name, score)
@@ -143,7 +152,8 @@ def create_game(p_name, start_location):
 
 
 # argumentit ensimmäinen ja toinen sijainti
-# palauttaa sijaintien välisen etäisyys
+# palauttaa sijaintien välisen etäisyyden
+# "distance": float numero
 @app.route('/get_distance/<current>/<target>')
 def get_distance(current, target):
     start = get_airport_info(current)
@@ -153,6 +163,9 @@ def get_distance(current, target):
     return {"distance": result_distance}
 
 
+# game id ja sijainti argumentteina
+# palauttaa informaation sijainnin random_encounterista
+# jos ei ole random encounteria palauttaa vain yhden rivin: {"re_id": 0}
 @app.route('/re_info/<game_id>/<location>')
 def re_info(game_id, location):
     re_id = check_which_re(game_id, location)["re_id"]
@@ -166,6 +179,7 @@ def re_info(game_id, location):
         return ref
 
 
+# palauttaa listan lentokentistä annetulla sijainnilla ja rangella
 @app.route('/airports_in_range/<icao>/<range_left>')
 def airports_in_range(icao, range_left):
     in_range = []
@@ -176,6 +190,7 @@ def airports_in_range(icao, range_left):
     return in_range
 
 
+# päivittää peli tauluun sijainnin rangen ja rahan
 @app.route('/update_location/<game_id>/<range>/<money>/<location>')
 def update_location(game_id, range, money, location):
     sql = f'''UPDATE game SET location = %s, range_budget = %s, money_budget = %s WHERE id = %s'''
@@ -184,6 +199,7 @@ def update_location(game_id, range, money, location):
     return {"game_id": game_id, "location": location, "range": range, "money": money}
 
 
+# päivittää peli tauluun scoren
 @app.route('/update_score/<game_id>/<score>')
 def update_score(game_id, score):
     sql = f'''UPDATE game SET score = %s WHERE id = %s'''
@@ -191,7 +207,8 @@ def update_score(game_id, score):
     cursor.execute(sql, (score, game_id,))
     return {"game_id": game_id, "score": score}
 
-
+# palauttaa json {"is_valid": True/False} sen perusteella onko icaota olemassa meidän lentokentissä
+# (tod näk turha..)
 @app.route('/is_valid/<icao>')
 def is_valid(icao):
     this_all_airports = get_airports()
