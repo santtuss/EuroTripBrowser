@@ -14,8 +14,19 @@ main {
     height: 80vmin;
     background-color: silver;
     margin: 10px;
+    position: relative;
 }
 
+#stampAchievedDialog {
+    position: absolute;
+    margin-left: 0;
+    width: 10vw;
+    height: 10vh;
+}
+
+#stampAchievedDialog::backdrop {
+    background-color: rgba(0, 0, 0, 0);
+}
 .boxes {
     width: 100%;
 
@@ -97,4 +108,30 @@ h2 {
 .icon {
     width: 50px;
     margin: 10px;
+}
+
+.gameinfofield {
+    font-size: large;
+    padding: -10px;
+    margin: 0;
+}
+
+#moreInformationDialog p {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#cancelButton2 {
+  background-color: #FF7058;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+#cancelButton2:hover {
+  background-color: #ff6666;
 }

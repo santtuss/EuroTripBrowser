@@ -1,66 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>EuroTrip</title>
+    <meta charset="utf-8">
+    <title>EuroTrip</title>
 
-  <link href="style.css" rel="stylesheet"/>
-  <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
-  <script src="eurotrip.js" defer></script>
-  <script src=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js "></script>
-  <link href=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css " rel="stylesheet">
+    <link href="style.css" rel="stylesheet"/>
+    <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
+    <script src="eurotrip.js" defer></script>
+    <script src=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js "></script>
+    <link href=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css " rel="stylesheet">
 </head>
 
 <body>
-  <header><h2>EuroTrip</h2></header>
-  <main>
+<header><h2>EuroTrip</h2></header>
+<main>
 
     <dialog id="nameinput">
-      <form id="name-form">
-        <label for="name-input">Insert Your Name<br>
-        </label><input type="text" id="name-input" required><br>
-        <input type="submit" value="New Game">
-      </form>
+        <form id="name-form">
+            <label for="name-input">Insert Your Name<br>
+            </label><input type="text" id="name-input" required><br>
+            <input type="submit" value="New Game">
+        </form>
     </dialog>
 
+    <dialog id="helpDialog">
+        <p>Help</p>
+        <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!</p>
+        <button id="moreInformation">More information</button>
+        <button id="cancelHelpButton">Cancel</button>
+    </dialog>
+
+    <dialog id="moreInformationDialog">
+        <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!</p>
+        <p>Travel around Europe, manage your money, and pay attention to your range amount.</p>
+        <p>You can take a loan up to 50 000€. You can buy more range (1km = 1€).</p>
+        <p>Your current location is viewed with a red color.</p>
+        <p>You can view your stamps from the Stamps-button. <img class="icon" src="image/travel.svg" alt="stamps icon"
+                                                                 height="20px"></p>
+        <p>You can buy range from Shop-button. <img class="icon" src="image/shop.svg" alt="shop icon" height="20px"></p>
+        <p>You can take a loan from Bank-button. <img class="icon" src="image/piggy-bank.svg" alt="bank icon"
+                                                      height="20px"></p>
+        <p>Visited airports are listed above the stamps, shop, and bank.</p>
+        <button id="cancelButton2">Cancel</button>
+    </dialog>
+
+    <dialog id="customAlert">
+        <p> You are out of range! </p>
+        <button id="buyRange">Buy range</button>
+        <button id="takeLoan">Take loan</button>
+        <button id="cancelAlertButton">No</button>
+    </dialog>
+
+    <dialog id="stampAchievedDialog">
+        <p>:P</p>
+    </dialog>
 
     <dialog id="shopDialog">
-      <p>Do you want to buy range?</p>
-      <button id="buyRangeButton">Yes</button>
-      <button id="cancelBuyButton">No</button>
+        <p>Do you want to buy range?</p>
+        <button id="buyRangeButton">Yes</button>
+        <button id="cancelBuyButton">No</button>
     </dialog>
 
     <dialog id="rangeAmountDialog">
-      <p>Enter range amount:</p>
-      <label for="rangeAmount">Amount:</label>
-      <input type="number" id="rangeAmount" min="1" required><br>
-      <button id="confirmBuyButton">Confirm</button>
-      <button id="cancelBuyButton2">Cancel</button>
+        <p>Enter range amount:</p>
+        <label for="rangeAmount">Amount:</label>
+        <input type="number" id="rangeAmount" min="1" required><br>
+        <button id="confirmBuyButton">Confirm</button>
+        <button id="cancelBuyButton2">Cancel</button>
     </dialog>
 
+    <dialog id="bankDialog">
+        <p>Do you want to take loan?</p>
+        <button id="TakeLoanButton">Yes</button>
+        <button id="cancelLoanButton">No</button>
+    </dialog>
+
+    <dialog id="LoanAmountDialog">
+        <p>Enter loan amount (1-<span id="maxloanleft"></span>):</p>
+        <label for="LoanAmount">Amount:</label>
+        <input type="number" id="LoanAmount" min="1" required><br>
+        <button id="confirmLoanButton">Confirm</button>
+        <button id="cancelLoanButton2">Cancel</button>
+    </dialog>
 
     <div id="map"></div>
     <div class="boxes">
-    <section>
-      <ul>
-        <li id="moneyfield"></li>
-        <li id="rangefield"></li>
-        <li>stamps</li>
-      </ul>
-      <p id="p_name">player name</p>
-      <p id="p_location">location</p>
-      <p>goal</p>
-    </section>
-    <section>
-      <ul>
-        <li class="button1" id="travel_button"><img class="icon" src="image/travel.svg" alt="travel button"></li>
-        <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button"></li>
-        <li class="button3"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
-      </ul>
-    </section>
-      <section>Visited airports: <br><select id="visited_dropdown"></select></section>
+        <section>
+            <ul>
+                <li><img src="image/money-bag.svg" alt="money bag icon" width="16px"> Money<br><span
+                        class="gameinfofield" id="moneyfield"></span></li>
+                <li><img src="image/fuel.svg" alt="fuel icon" width="16px"> Range<br><span class="gameinfofield"
+                                                                                           id="rangefield"></span></li>
+                <li><img src="image/reward.svg" alt="reward icon" width="16px"> Stamps<br><span class="gameinfofield"
+                                                                                                id="stampfield"></span>
+                </li>
+            </ul>
+            <p id="p_name">player name</p>
+            <p id="p_location">location</p>
+            <p>goal</p>
+        </section>
+        <section>
+            <ul>
+                <li class="button1" id="travel_button"><img class="icon" src="image/travel.svg" alt="travel button">
+                </li>
+                <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button">
+                </li>
+                <li class="button3" id="openBankDialogButton"><img class="icon" src="image/piggy-bank.svg"
+                                                                   alt="bank button"></li>
+            </ul>
+        </section>
+        <section>Visited airports: <br><select id="visited_dropdown"></select></section>
     </div>
-  </main>
-  <footer>footer</footer>
+</main>
+<footer>
+    <button id="openHelpDialogButton">?</button>
+</footer>
 </body>
 </html>

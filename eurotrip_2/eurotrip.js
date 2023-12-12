@@ -7,16 +7,21 @@ document.querySelector('#nameinput').showModal()
 const start_money = 2000
 const start_range = 2000
 const start_airport = "EFHK"
+let MaxLoan = 50000
+
 
 let cur_money = start_money
 let cur_range = start_range
 let cur_airport = start_airport
 let current_info = []
+let LoanTaken = 0
+let stamps = 0
 
 // creates map
 const map = L.map('map').setView([60.1699, 24.9384], 3);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    minZoom: 3,
+    maxZoom: 15,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 const markergroup = L.layerGroup().addTo(map)
@@ -29,14 +34,17 @@ async function FlyTo(range, money, loc) {
   cur_money = result["money"]
   cur_range = result["range"]
   cur_airport = result["location"]
-  document.querySelector("#moneyfield").innerHTML = `Money:<br>${cur_money} €`
-  document.querySelector("#rangefield").innerHTML = `Range:<br>${cur_range} km`
+  document.querySelector("#moneyfield").innerHTML = `${cur_money} €`
+  document.querySelector("#rangefield").innerHTML = `${cur_range} km`
+  document.querySelector('#stampfield').innerHTML = `${stamps}/5`
   const this_fetch = await fetch(`${url}/get_airport_info/${cur_airport}`)
   current_info = await this_fetch.json()
   document.querySelector("#p_location").innerHTML = "Current Location: " + current_info['name']
+  await GoalCheck(cur_airport)
   await fetch(`${url}/update_visited_status/${game_id}/${cur_airport}`)
-  await PushpinsInRange(cur_airport, cur_range)
+  await NoRangeLeft(cur_airport, cur_range)
   ShowVisited()
+  await PushpinsInRange(cur_airport, cur_range)
 }
 
 // oli pakko tehdä erillinen funktio kauppaa ja pankkia varten, FlyTo tekee
@@ -47,8 +55,8 @@ async function UpdateMoneyOrRange(range, money) {
   const result = await response.json()
   cur_money = result["money"]
   cur_range = result["range"]
-  document.querySelector("#moneyfield").innerHTML = `Money:<br>${cur_money} €`
-  document.querySelector("#rangefield").innerHTML = `Range:<br>${cur_range} km`
+  document.querySelector("#moneyfield").innerHTML = `${cur_money} €`
+  document.querySelector("#rangefield").innerHTML = `${cur_range} km`
 }
 
 
@@ -97,6 +105,7 @@ async function PushpinsInRange(loc, range){
 nameform.addEventListener('submit', async function(evt){
   evt.preventDefault()
   document.querySelector("#nameinput").close()
+  helpDialog.showModal();
   const name = document.querySelector("#name-input").value
   document.querySelector("#p_name").innerHTML = "Name: " + name
   const response = await fetch(`${url}/create_game/${name}/EFHK`)
@@ -105,9 +114,26 @@ nameform.addEventListener('submit', async function(evt){
   await FlyTo(start_range, start_money, start_airport)
 });
 
+// goal check argumenttina loc (sijainti)
+// laitetaan flyTo loppupäähän, async
+async function GoalCheck(loc) {
+  const request = await fetch(`${url}/check_if_goal/${loc}`)
+  const my_response = await request.json()
+  if (my_response["has_goal"])
+  {
+    stamps++
+    document.querySelector('#stampfield').innerHTML = `${stamps}/5`
+    const achieved_dialog = document.querySelector('#stampAchievedDialog')
+    achieved_dialog.showModal()
+    setTimeout(function(){achieved_dialog.close()}, 2000)
+  }
+  else {
+    console.log("no goal")
+  }
+}
 
-// (joonas) showvisited
-// ei oo enään async
+
+// lisää visited kaupungit drop down listaan
 function ShowVisited(){
     const dropdown = document.querySelector('#visited_dropdown')
     const listItems = document.createElement('option')
@@ -116,15 +142,11 @@ function ShowVisited(){
 }
 
 // current location
-document.querySelector('.button1').addEventListener('click', async function() {
-  RemoveMarkers(markergroup)
-  const gameCoordinates = await getCoordinatesForLocation(cur_airport);
-  const redMarker = L.marker(gameCoordinates, { icon: redIcon }).addTo(map);
-  redMarker.bindPopup(`Current Location`).openPopup();
+document.querySelector('#travel_button').addEventListener('click', async function() {
+  console.log("ok")
 });
 
 
-// MUOKKAA!!!!!!!!!!!!!!
 async function getCoordinatesForLocation(location) {
   const coord_request = await fetch(`${url}/get_airport_info/${location}`)
   const coord_response = await coord_request.json()
@@ -189,3 +211,111 @@ const cancelBuyButton2 = document.getElementById('cancelBuyButton2');
     cancelBuyButton2.addEventListener('click', function() {
       rangeAmountDialog.close();
     });
+
+
+// pankki
+
+let MaxLoanLeft = MaxLoan - LoanTaken
+
+const openBankDialogButton = document.querySelector('.button3');
+    const bankDialog = document.getElementById('bankDialog');
+    const TakeLoanButton = document.getElementById('TakeLoanButton');
+    const cancelLoanButton = document.getElementById('cancelLoanButton');
+    const LoanAmountDialog = document.getElementById('LoanAmountDialog');
+    const confirmLoanButton = document.getElementById('confirmLoanButton');
+    const cancelLoanButton2 = document.getElementById('cancelLoanButton2');
+
+    openBankDialogButton.addEventListener('click', function () {
+      document.querySelector('#maxloanleft').innerHTML = MaxLoanLeft.toString()
+      bankDialog.showModal();
+    });
+
+    TakeLoanButton.addEventListener('click', function () {
+      LoanAmountDialog.showModal();
+      bankDialog.close();
+    });
+
+confirmLoanButton.addEventListener('click', async function() {
+  const LoanAmountInput = document.getElementById('LoanAmount');
+  const LoanAmount = parseInt(LoanAmountInput.value, 10);
+  if (!isNaN(LoanAmount) && LoanAmount > 0 && LoanAmount <= MaxLoanLeft) {
+    console.log('Taking loan of ' + LoanAmount + ' euros.');
+    LoanTaken += LoanAmount
+    MaxLoanLeft = MaxLoan - LoanTaken
+    const new_money = parseInt(cur_money) + LoanAmount
+    await UpdateMoneyOrRange(cur_range, new_money)
+    LoanAmountDialog.close();
+  } else {
+    alert(`Enter a valid loan amount (1 - ${MaxLoanLeft}).`);
+  }
+});
+
+    cancelLoanButton.addEventListener('click', function () {
+      bankDialog.close();
+    });
+
+    cancelLoanButton2.addEventListener('click', function () {
+      LoanAmountDialog.close();
+    });
+
+const openHelpDialogButton = document.getElementById('openHelpDialogButton');
+const helpDialog = document.getElementById('helpDialog');
+const moreInformationButton = document.getElementById('moreInformation');
+const cancelHelpButton = document.getElementById('cancelHelpButton');
+const moreInformationDialog = document.getElementById('moreInformationDialog');
+const cancelButton2 = document.getElementById('cancelButton2');
+
+openHelpDialogButton.addEventListener('click', function() {
+    helpDialog.showModal();
+});
+
+moreInformationButton.addEventListener('click', function() {
+    moreInformationDialog.showModal();
+    helpDialog.close();
+});
+
+cancelHelpButton.addEventListener('click', function() {
+    helpDialog.close();
+});
+
+cancelButton2.addEventListener('click', function() {
+    moreInformationDialog.close();
+});
+
+async function NoRangeLeft(loc, range) {
+  console.log("norangeleft called")
+  const response = await fetch(`${url}/airports_in_range/${loc}/${range}`)
+  console.log(response)
+  const result = await response.json()
+  console.log(result)
+  if (result.length === 0){
+    console.log('norangeleft OK')
+    showAlert()
+  }
+}
+function showAlert(){
+  const customAlert = document.querySelector('#customAlert');
+  customAlert.showModal()
+
+  const buyRange = document.querySelector('#buyRange')
+  buyRange.addEventListener('click',() => {
+    customAlert.close();
+    const range = document.querySelector('#openShopDialogButton')
+    range.click();
+  })
+
+
+  const takeLoan = document.querySelector('#takeLoan')
+  takeLoan.addEventListener('click',() => {
+    customAlert.close();
+    const range = document.querySelector('#openBankDialogButton')
+    range.click();
+  })
+
+  const cancelButton = document.querySelector('#cancelAlertButton')
+  cancelButton.addEventListener('click',() =>{
+    customAlert.close();
+  })
+}
+
+
