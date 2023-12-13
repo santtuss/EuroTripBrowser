@@ -34,7 +34,7 @@ def get_airports():
 # argumenttina icao-koodi, palauttaa icao koodia vastaavan lentokentän tiedot
 @app.route('/get_airport_info/<icao>')
 def get_airport_info(icao):
-    sql = f'''SELECT iso_country, ident, name, latitude_deg, longitude_deg, population, is_capital, passengers
+    sql = f'''SELECT iso_country, ident, name, latitude_deg, longitude_deg, population, is_capital, passengers, municipality
             FROM airport WHERE ident = %s'''
     cursor = conn.cursor(dictionary=True)
     cursor.execute(sql, (icao,))
@@ -144,9 +144,13 @@ def create_game(p_name, start_location):
     random.shuffle(g_ports)
 
     for i, re_id in enumerate(encounter_list):
-        sql = "INSERT INTO encounter_location (el_game, el_location, el_encounter, visited) VALUES (%s, %s, %s, 0);"
+        sql = ("INSERT INTO encounter_location (el_game, el_location, el_encounter, visited) VALUES (%s, %s, %s, 0);")
         cursor = conn.cursor(dictionary=True)
         cursor.execute(sql, (g_id, g_ports[i]['ident'], re_id))
+
+    sql = "DELETE FROM `encounter_location` WHERE `el_location` = 'EFHK';"
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute(sql,)
 
     return {"game_id": g_id}
 

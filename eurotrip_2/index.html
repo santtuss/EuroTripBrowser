@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>EuroTrip</title>
 
-    <link href="style.css" rel="stylesheet"/>
+    <link href="light-theme.css" rel="stylesheet" id="theme-link"/>
     <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
     <script src="eurotrip.js" defer></script>
     <script src=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js "></script>
@@ -23,10 +23,15 @@
         </form>
     </dialog>
 
+    <dialog id="reDialog">
+        <div id="reDialogContent"></div>
+        <button id="cancelButtonRe">Cancel</button>
+    </dialog>
+
     <dialog id="helpDialog">
-        <p>Help</p>
         <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!</p>
         <button id="moreInformation">More information</button>
+        <button id="storyButton">Show the Story</button>
         <button id="cancelHelpButton">Cancel</button>
     </dialog>
 
@@ -40,8 +45,13 @@
         <p>You can buy range from Shop-button. <img class="icon" src="image/shop.svg" alt="shop icon" height="20px"></p>
         <p>You can take a loan from Bank-button. <img class="icon" src="image/piggy-bank.svg" alt="bank icon"
                                                       height="20px"></p>
-        <p>Visited airports are listed above the stamps, shop, and bank.</p>
+        <p>Visited airports are listed above the stamps, shop, and bank.</p><br>
         <button id="cancelButton2">Cancel</button>
+    </dialog>
+
+    <dialog id="GameOverDialog">
+        <h2>Game Over.</h2>
+        <button id="restartGame">Restart Game</button>
     </dialog>
 
     <dialog id="customAlert">
@@ -53,6 +63,11 @@
 
     <dialog id="stampAchievedDialog">
         <p>:P</p>
+    </dialog>
+
+    <dialog id="imagePopup">
+        <img id="popupImage" src="" alt="Popup Image">
+        <button id="closePopupButton">Close</button>
     </dialog>
 
     <dialog id="shopDialog">
@@ -83,6 +98,38 @@
         <button id="cancelLoanButton2">Cancel</button>
     </dialog>
 
+    <dialog id="PassportDialog">
+        <section id="passport">
+            <div class="passportslot" id="slot1"><p class="label" id="label1"></p></div>
+            <div class="passportslot" id="slot2"><p class="label" id="label2"></p></div>
+            <div class="passportslot" id="slot3"><p class="label" id="label3"></p></div>
+            <div class="passportslot" id="slot4"><p class="label" id="label4"></p></div>
+            <div class="passportslot" id="slot5"><p class="label" id="label5"></p></div>
+        </section>
+        <button id="cancelButtonPassport">Cancel</button>
+    </dialog>
+
+    <dialog id="storyDialog">
+    <p>
+        Great, summer vacation has finally arrived, and you have a unique opportunity to spend it in<br>
+        the spirit of the first-ever Eurotrip-appro events! <br><br>
+        The task of these events is to travel around Europe and collect 5 stamps in your passport.<br>
+        Team C student association is providing each participant <br>
+        with a €2000 travel budget and 800 freely usable kilometers from AirMetro airline.<br>
+        There might be all sorts of things happening along the journey, so stay alert!<br>
+        Fortunately, you have a loan at your disposal and can withdraw it if necessary.<br><br>
+        Keep in mind, though, that the loan is limited. Good luck on your trip!
+        <button id="cancelButton3">Close</button>
+    </p>
+    </dialog>
+
+    <dialog id="fireworksDialog">
+    <div class="fireworks-container">
+    </div>
+    <p>Congratulations! You've collected 5 stamps!</p>
+    <button id="closeFireworksButton">Close</button>
+    </dialog>
+
     <div id="map"></div>
     <div class="boxes">
         <section>
@@ -95,9 +142,9 @@
                                                                                                 id="stampfield"></span>
                 </li>
             </ul>
-            <p id="p_name">player name</p>
-            <p id="p_location">location</p>
-            <p>goal</p>
+            <p id="p_name"></p>
+            <p id="p_location"></p>
+            <p id="small-notification"></p>
         </section>
         <section>
             <ul>
@@ -105,8 +152,7 @@
                 </li>
                 <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button">
                 </li>
-                <li class="button3" id="openBankDialogButton"><img class="icon" src="image/piggy-bank.svg"
-                                                                   alt="bank button"></li>
+                <li class="button3" id="openBankDialogButton"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
             </ul>
         </section>
         <section>Visited airports: <br><select id="visited_dropdown"></select></section>
@@ -114,6 +160,8 @@
 </main>
 <footer>
     <button id="openHelpDialogButton">?</button>
+    <button id="darkmodebtn">light/dark</button>
+    <button id="restartbutton">restart</button>
 </footer>
 </body>
 </html>
