@@ -7,7 +7,7 @@ document.querySelector('#nameinput').showModal()
 const start_money = 2000
 const start_range = 2000
 const start_airport = "EFHK"
-let MaxLoan = 200
+let MaxLoan = 1000
 
 let cur_money = start_money
 let cur_range = start_range
@@ -18,6 +18,8 @@ let stamps = 0
 
 // creates map
 const map = L.map('map').setView([60.1699, 24.9384], 3);
+
+
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     minZoom: 3,
     maxZoom: 15,
@@ -28,24 +30,29 @@ const markergroup = L.layerGroup().addTo(map)
 
 // updatee pelaajan sijainnin rahan ja rangen
 async function FlyTo(range, money, loc) {
-  const response = await fetch(`${url}/update_location/${game_id}/${range}/${money}/${loc}`)
-  const result = await response.json()
-  cur_money = result["money"]
-  cur_range = result["range"]
-  cur_airport = result["location"]
+  try {
+    const response = await fetch(`${url}/update_location/${game_id}/${range}/${money}/${loc}`)
+    const result = await response.json()
+    cur_money = result["money"]
+    cur_range = result["range"]
+    cur_airport = result["location"]
+  } catch(error) {
+    console.log("Error")
+  }
   document.querySelector("#moneyfield").innerHTML = `${cur_money} €`
   document.querySelector("#rangefield").innerHTML = `${cur_range} km`
   document.querySelector('#stampfield').innerHTML = `${stamps}/5`
   const this_fetch = await fetch(`${url}/get_airport_info/${cur_airport}`)
   current_info = await this_fetch.json()
-  document.querySelector("#p_location").innerHTML = "Current Location: " + current_info['name']
-  await ReCheck(cur_airport)
-  await GoalCheck(cur_airport)
-  CheckGameOver()
-  await NoRangeLeft(cur_airport, cur_range)
-  await PushpinsInRange(cur_airport, cur_range)
-  ShowVisited()
-  await fetch(`${url}/update_visited_status/${game_id}/${cur_airport}`)
+  document.querySelector("#p_location").innerHTML = "<b>Current Location:</b> " + current_info['name']
+  if (await GoalCheck(cur_airport) !== "win") {
+      await ReCheck(cur_airport)
+      await NoRangeLeft(cur_airport, cur_range)
+      await PushpinsInRange(cur_airport, cur_range)
+      ShowVisited()
+      await fetch(`${url}/update_visited_status/${game_id}/${cur_airport}`)
+
+  }
 }
 
 // oli pakko tehdä erillinen funktio kauppaa ja pankkia varten, FlyTo tekee
@@ -60,7 +67,12 @@ async function UpdateMoneyOrRange(range, money) {
     await NoRangeLeft(cur_airport, cur_range)
   }
   if (cur_money < 0) {
-    alert("You're out of money! HINT: You can take a loan")
+    if (MaxLoan > LoanTaken) {
+      alert("You're out of money! HINT: You can take a loan")
+    }
+    else {
+      CheckGameOver()
+    }
   }
   document.querySelector("#moneyfield").innerHTML = `${cur_money} €`
   document.querySelector("#rangefield").innerHTML = `${cur_range} km`
@@ -78,20 +90,17 @@ function RemoveMarkers(group) {
 
 // näyttää rangen sisällä olevat pushpinit + luo niihin napit joilla voi lentää paikkoihin
 async function PushpinsInRange(loc, range){
-  try {
-    RemoveMarkers(markergroup)
-    const redMarker = L.marker([current_info['latitude_deg'], current_info['longitude_deg']], { icon: redIcon }).addTo(markergroup);
-    redMarker.bindPopup(`Current Location`);
-    const response = await fetch(`${url}/airports_in_range/${loc}/${range}`)
-    const result = await response.json()
-
+  RemoveMarkers(markergroup)
+  const redMarker = L.marker([current_info['latitude_deg'], current_info['longitude_deg']], { icon: redIcon }).addTo(markergroup);
+  redMarker.bindPopup(`Current Location`);
+  const response = await fetch(`${url}/airports_in_range/${loc}/${range}`)
+  const result = await response.json()
     for (let i = 0; i < result.length; i++) {
       const marker = L.marker([result[i]['latitude_deg'], result[i]['longitude_deg']]);
       markergroup.addLayer(marker).addTo(map)
       const distance = await fetch(`${url}/get_distance/${cur_airport}/${result[i]['ident']}`)
       const distance_result = await distance.json()
       const distance_int = Math.floor(distance_result['distance'] + 1)
-
       const button = document.createElement('button')
       button.innerHTML = `Fly Here`
       button.class = "flybutton"
@@ -103,11 +112,8 @@ async function PushpinsInRange(loc, range){
 
       // tapahtuu kun klikkaa 'fly here' nappia
       button.addEventListener('click', async function() {
-      await FlyTo((cur_range - distance_int), cur_money, result[i]['ident'])
+        await FlyTo((cur_range - distance_int), cur_money, result[i]['ident'])
   })}
-  } catch(error) {
-    console.log(error)
-  }
 }
 
 
@@ -117,7 +123,7 @@ nameform.addEventListener('submit', async function(evt){
   document.querySelector("#nameinput").close()
   helpDialog.showModal();
   const name = document.querySelector("#name-input").value
-  document.querySelector("#p_name").innerHTML = "Name: " + name
+  document.querySelector("#p_name").innerHTML = "<b>Name: </b>" + name
   const response = await fetch(`${url}/create_game/${name}/EFHK`)
   const result = await response.json()
   game_id = result["game_id"]
@@ -135,30 +141,42 @@ nameform.addEventListener('submit', async function(evt){
 async function GoalCheck(loc) {
   const request = await fetch(`${url}/check_if_goal/${loc}`)
   const my_response = await request.json()
-  if (my_response["has_goal"])
+  const visited_request = await fetch(`${url}/check_if_visited/${game_id}/${loc}`)
+  const my_visited_response = await visited_request.json()
+  if (my_response["has_goal"] && !my_visited_response["visited"])
   {
     stamps++
     AddStamp(loc, stamps)
     document.querySelector('#stampfield').innerHTML = `${stamps}/5`
     if (stamps < 5){
       const achieved_dialog = document.querySelector('#stampAchievedDialog')
+      const stampImage = document.querySelector('#stampImage');
+      stampImage.src = `stamps/${current_info['municipality'].toLowerCase()}.png`;
+      const cancel = document.querySelector('#stampAchievedCancel')
+      cancel.addEventListener('click', function(){
+        achieved_dialog.close()
+      })
       achieved_dialog.showModal()
-      setTimeout(function(){achieved_dialog.close()}, 2000)
     }
     if (stamps >= 5){
-      console.log("win")
       const fireworksDialog = document.getElementById('fireworksDialog');
       fireworksDialog.showModal();
-
-      const closeFireworksButton = document.getElementById('closeFireworksButton');
-      closeFireworksButton.addEventListener('click', function () {
-      fireworksDialog.close();});
-
+      const newGameAfterWin = document.getElementById('newGame');
+      newGameAfterWin.addEventListener('click', function() {
+        fireworksDialog.close()
+        RestartGame()})
+      return "win"
     }
   }
   else {
-    document.querySelector('#small-notification').style = 'color:#FF7058;'
-    document.querySelector('#small-notification').innerHTML = `No goal here!`
+    if (my_visited_response["visited"]) {
+      document.querySelector('#small-notification').style = 'color:#2dd0b8;'
+      document.querySelector('#small-notification').innerHTML = ` Welcome back!`
+    }
+    else if (cur_airport !== "EFHK") {
+      document.querySelector('#small-notification').style = 'color:#FF7058;'
+      document.querySelector('#small-notification').innerHTML = ` No stamp here!`
+    }
     setTimeout(function(){
       document.querySelector('#small-notification').innerHTML = ``
     }, 5000)
@@ -341,9 +359,11 @@ const GameOverDialog = document.getElementById('GameOverDialog');
 const restartGame = document.getElementById('restartGame');
 restartGame.addEventListener('click', function() {RestartGame()})
 
-async function CheckGameOver(){
-  if (cur_money <= 0 && LoanTaken <= MaxLoan && stamps < 5 && cur_range <= 0) {
-    console.log('Game Over.');
+
+
+
+function CheckGameOver(){
+  if (cur_money <= 0 && LoanTaken >= MaxLoan && stamps < 5) {
     GameOverDialog.showModal();
   }
 }
@@ -360,6 +380,7 @@ async function NoRangeLeft(loc, range) {
 function showAlert(){
   const customAlert = document.querySelector('#customAlert');
   customAlert.showModal()
+  CheckGameOver()
 
   const buyRange = document.querySelector('#buyRange')
   buyRange.addEventListener('click',() => {
@@ -384,6 +405,16 @@ function showAlert(){
 
 // restart game function
 function RestartGame() {
+  const listofdialogs = document.querySelectorAll('dialog')
+  for (let i = 0; i < listofdialogs.length; i++) {
+    listofdialogs[i].close()
+  }
+  const slots = document.querySelectorAll('.passportslot')
+  console.log(slots)
+  for (let i = 0; i < slots.length; i++) {
+    slots[i].innerHTML = `<p class="label" id="label${i+1}"></p>`
+    console.log(slots[i])
+  }
   document.querySelector("#nameinput").showModal()
 }
 
@@ -395,11 +426,15 @@ restartbutton.addEventListener('click', function(){RestartGame()})
 const darkmodebtn = document.querySelector('#darkmodebtn');
 const theme = document.querySelector('#theme-link');
 darkmodebtn.addEventListener('click', function(){
+  console.log(theme.getAttribute("href"))
   if (theme.getAttribute("href") === "light-theme.css") {
     theme.href = "dark-theme.css";
+    darkmodebtn.innerHTML = "Light Mode"
   } else {
     theme.href = "light-theme.css";
+    darkmodebtn.innerHTML = "Dark Mode"
   }
+  console.log(theme.getAttribute("href"))
 });
 
 const passportdialog = document.querySelector('#PassportDialog')
@@ -410,8 +445,20 @@ document.querySelector('#travel_button').addEventListener('click', async functio
 });
 
 function AddStamp(loc, i) {
-  const slot = document.querySelector(`#slot${i}`)
-  const label = document.querySelector(`#label${i}`)
+  const totalSlots = 7;
+  let nextSlot = i;
+
+  while (
+    (nextSlot === 2 || nextSlot === 5) ||
+    (document.querySelector(`#label${nextSlot}`) && document.querySelector(`#label${nextSlot}`).innerHTML !== '')
+  ) {
+    nextSlot++;
+    if (nextSlot > totalSlots) {
+      nextSlot = 1;
+    }
+  }
+  const slot = document.querySelector(`#slot${nextSlot}`)
+  const label = document.querySelector(`#label${nextSlot}`)
   const source = `${current_info['municipality'].toLowerCase()}.png`
   label.innerHTML = `${current_info['municipality']}`
   const image = document.createElement('img')
@@ -419,4 +466,18 @@ function AddStamp(loc, i) {
   image.width = 150
   image.height = 150
   slot.appendChild(image)
+
+  image.classList.add('stamped');
+
+  image.addEventListener('animationend', function () {
+    image.classList.remove('stamped');
+  });
 }
+
+document.querySelector('#seepassportbutton').addEventListener('click', function(){
+  document.querySelector('#travel_button').click()
+})
+
+document.querySelector('#openPassport').addEventListener('click', function(){
+  document.querySelector('#travel_button').click()
+})

@@ -6,6 +6,7 @@
 
     <link href="light-theme.css" rel="stylesheet" id="theme-link"/>
     <link href='https://fonts.googleapis.com/css?family=Dhurjati' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700&display=swap" rel="stylesheet">
     <script src="eurotrip.js" defer></script>
     <script src=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js "></script>
     <link href=" https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css " rel="stylesheet">
@@ -19,20 +20,20 @@
         <form id="name-form">
             <label for="name-input">Insert Your Name<br>
             </label><input type="text" id="name-input" required><br>
-            <input type="submit" value="New Game">
+            <input id="submitbutton" type="submit" value="New Game">
         </form>
     </dialog>
 
     <dialog id="reDialog">
         <div id="reDialogContent"></div>
-        <button id="cancelButtonRe">Cancel</button>
+        <button class="cancel" id="cancelButtonRe">Cancel</button>
     </dialog>
 
     <dialog id="helpDialog">
         <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!</p>
         <button id="moreInformation">More information</button>
         <button id="storyButton">Show the Story</button>
-        <button id="cancelHelpButton">Cancel</button>
+        <button class="cancel" id="cancelHelpButton">Cancel</button>
     </dialog>
 
     <dialog id="moreInformationDialog">
@@ -40,17 +41,17 @@
         <p>Travel around Europe, manage your money, and pay attention to your range amount.</p>
         <p>You can take a loan up to 50 000€. You can buy more range (1km = 1€).</p>
         <p>Your current location is viewed with a red color.</p>
-        <p>You can view your stamps from the Stamps-button. <img class="icon" src="image/travel.svg" alt="stamps icon"
+        <p>You can view your stamps from the Stamps-button. <img class="icon" src="image/reward.svg" alt="stamps icon"
                                                                  height="20px"></p>
         <p>You can buy range from Shop-button. <img class="icon" src="image/shop.svg" alt="shop icon" height="20px"></p>
         <p>You can take a loan from Bank-button. <img class="icon" src="image/piggy-bank.svg" alt="bank icon"
                                                       height="20px"></p>
         <p>Visited airports are listed above the stamps, shop, and bank.</p><br>
-        <button id="cancelButton2">Cancel</button>
+        <button class="cancel" id="cancelButton2">Cancel</button>
     </dialog>
 
     <dialog id="GameOverDialog">
-        <h2>Game Over.</h2>
+        <h2>☠ Game Over ☠</h2>
         <button id="restartGame">Restart Game</button>
     </dialog>
 
@@ -58,11 +59,14 @@
         <p> You are out of range! </p>
         <button id="buyRange">Buy range</button>
         <button id="takeLoan">Take loan</button>
-        <button id="cancelAlertButton">No</button>
+        <button class="cancel" id="cancelAlertButton">Cancel</button>
     </dialog>
 
     <dialog id="stampAchievedDialog">
-        <p>:P</p>
+        <h3>Yay! You got a stamp!</h3>
+        <img id="stampImage"><br>
+        <button id="openPassport">Open Passport</button>
+        <button class="cancel" id="stampAchievedCancel">Cancel</button>
     </dialog>
 
     <dialog id="imagePopup">
@@ -73,7 +77,7 @@
     <dialog id="shopDialog">
         <p>Do you want to buy range?</p>
         <button id="buyRangeButton">Yes</button>
-        <button id="cancelBuyButton">No</button>
+        <button class="cancel" id="cancelBuyButton">Cancel</button>
     </dialog>
 
     <dialog id="rangeAmountDialog">
@@ -81,13 +85,13 @@
         <label for="rangeAmount">Amount:</label>
         <input type="number" id="rangeAmount" min="1" required><br>
         <button id="confirmBuyButton">Confirm</button>
-        <button id="cancelBuyButton2">Cancel</button>
+        <button class="cancel" id="cancelBuyButton2">Cancel</button>
     </dialog>
 
     <dialog id="bankDialog">
         <p>Do you want to take loan?</p>
         <button id="TakeLoanButton">Yes</button>
-        <button id="cancelLoanButton">No</button>
+        <button class="cancel" id="cancelLoanButton">No</button>
     </dialog>
 
     <dialog id="LoanAmountDialog">
@@ -95,7 +99,7 @@
         <label for="LoanAmount">Amount:</label>
         <input type="number" id="LoanAmount" min="1" required><br>
         <button id="confirmLoanButton">Confirm</button>
-        <button id="cancelLoanButton2">Cancel</button>
+        <button class="cancel" id="cancelLoanButton2">Cancel</button>
     </dialog>
 
     <dialog id="PassportDialog">
@@ -105,8 +109,10 @@
             <div class="passportslot" id="slot3"><p class="label" id="label3"></p></div>
             <div class="passportslot" id="slot4"><p class="label" id="label4"></p></div>
             <div class="passportslot" id="slot5"><p class="label" id="label5"></p></div>
+            <div class="passportslot" id="slot6"><p class="label" id="label6"></p></div>
+            <div class="passportslot" id="slot7"><p class="label" id="label7"></p></div>
         </section>
-        <button id="cancelButtonPassport">Cancel</button>
+        <button class="cancel" id="cancelButtonPassport">Cancel</button>
     </dialog>
 
     <dialog id="storyDialog">
@@ -119,7 +125,7 @@
         There might be all sorts of things happening along the journey, so stay alert!<br>
         Fortunately, you have a loan at your disposal and can withdraw it if necessary.<br><br>
         Keep in mind, though, that the loan is limited. Good luck on your trip!
-        <button id="cancelButton3">Close</button>
+        <button class="cancel" id="cancelButton3">Close</button>
     </p>
     </dialog>
 
@@ -127,28 +133,29 @@
     <div class="fireworks-container">
     </div>
     <p>Congratulations! You've collected 5 stamps!</p>
-    <button id="closeFireworksButton">Close</button>
+    <button id="seepassportbutton">See Passport</button> <button id="newGame">New Game</button>
     </dialog>
 
     <div id="map"></div>
     <div class="boxes">
         <section>
-            <ul>
-                <li><img src="image/money-bag.svg" alt="money bag icon" width="16px"> Money<br><span
+            <ul id="biglabels">
+                <li><h4><img src="image/money-bag.svg" alt="money bag icon" width="20px"> Money</h4><span
                         class="gameinfofield" id="moneyfield"></span></li>
-                <li><img src="image/fuel.svg" alt="fuel icon" width="16px"> Range<br><span class="gameinfofield"
+                <li><h4><img src="image/fuel.svg" alt="fuel icon" width="20px"> Range</h4><span class="gameinfofield"
                                                                                            id="rangefield"></span></li>
-                <li><img src="image/reward.svg" alt="reward icon" width="16px"> Stamps<br><span class="gameinfofield"
+                <li><h4><img src="image/reward.svg" alt="reward icon" width="20px"> Stamps</h4><span class="gameinfofield"
                                                                                                 id="stampfield"></span>
                 </li>
             </ul>
+        </section>
+        <section id="smallinfo">
             <p id="p_name"></p>
-            <p id="p_location"></p>
-            <p id="small-notification"></p>
+            <p><span id="p_location"></span><span id="small-notification"></span></p>
         </section>
         <section>
             <ul>
-                <li class="button1" id="travel_button"><img class="icon" src="image/travel.svg" alt="travel button">
+                <li class="button1" id="travel_button"><img class="icon" src="image/reward.svg" alt="passport button">
                 </li>
                 <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button">
                 </li>
@@ -159,9 +166,9 @@
     </div>
 </main>
 <footer>
-    <button id="openHelpDialogButton">?</button>
-    <button id="darkmodebtn">light/dark</button>
-    <button id="restartbutton">restart</button>
+    <button class="footerbutton" id="openHelpDialogButton">?</button>
+    <button class="footerbutton" id="darkmodebtn">Dark Mode</button>
+    <button class="footerbutton" id="restartbutton">New Game</button>
 </footer>
 </body>
 </html>
