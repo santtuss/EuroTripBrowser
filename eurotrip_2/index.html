@@ -37,16 +37,16 @@
     </dialog>
 
     <dialog id="moreInformationDialog">
-        <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!</p>
-        <p>Travel around Europe, manage your money, and pay attention to your range amount.</p>
-        <p>You can take a loan up to 50 000€. You can buy more range (1km = 1€).</p>
-        <p>Your current location is viewed with a red color.</p>
-        <p>You can view your stamps from the Stamps-button. <img class="icon" src="image/reward.svg" alt="stamps icon"
-                                                                 height="20px"></p>
-        <p>You can buy range from Shop-button. <img class="icon" src="image/shop.svg" alt="shop icon" height="20px"></p>
-        <p>You can take a loan from Bank-button. <img class="icon" src="image/piggy-bank.svg" alt="bank icon"
-                                                      height="20px"></p>
-        <p>Visited airports are listed above the stamps, shop, and bank.</p><br>
+        <p>Your goal is to find 5 stamps from the biggest cities in Europe. Good luck!<br>
+        Travel around Europe, manage your money, and pay attention to your range amount.<br>
+        If you run out of money, you can always take a loan.<br>
+        You can buy more range with money (1km = 1€).
+        <br><br>
+        <img class="small icon" src="image/reward.svg" alt="stamps icon" height="20px"> View your stamps <br>
+        <img class="small icon" src="image/shop.svg" alt="shop icon" height="20px"> Buy range <br>
+        <img class="small icon" src="image/piggy-bank.svg" alt="bank icon" height="20px"> Take a loan <br><br>
+        Visited airports are listed above the stamps, shop, and bank.</p>
+        <br>
         <button class="cancel" id="cancelButton2">Cancel</button>
     </dialog>
 
@@ -112,19 +112,19 @@
             <div class="passportslot" id="slot6"><p class="label" id="label6"></p></div>
             <div class="passportslot" id="slot7"><p class="label" id="label7"></p></div>
         </section>
-        <button class="cancel" id="cancelButtonPassport">Cancel</button>
+        <button class="cancel" id="cancelButtonPassport">Close</button>
     </dialog>
 
     <dialog id="storyDialog">
     <p>
         Great, summer vacation has finally arrived, and you have a unique opportunity to spend it in<br>
-        the spirit of the first-ever Eurotrip-appro events! <br><br>
+        the spirit of the first-ever Eurotrip-appro event! <br><br>
         The task of these events is to travel around Europe and collect 5 stamps in your passport.<br>
         Team C student association is providing each participant <br>
-        with a €2000 travel budget and 800 freely usable kilometers from AirMetro airline.<br>
+        with a travel budget and some freely usable kilometers from the AirMetro airline.<br><br>
         There might be all sorts of things happening along the journey, so stay alert!<br>
-        Fortunately, you have a loan at your disposal and can withdraw it if necessary.<br><br>
-        Keep in mind, though, that the loan is limited. Good luck on your trip!
+        Fortunately, you have the student loan at your disposal and can withdraw it if necessary.<br><br>
+        Keep in mind, though, that the loan is limited. Good luck on your trip!<br>
         <button class="cancel" id="cancelButton3">Close</button>
     </p>
     </dialog>
@@ -133,7 +133,15 @@
     <div class="fireworks-container">
     </div>
     <p>Congratulations! You've collected 5 stamps!</p>
-    <button id="seepassportbutton">See Passport</button> <button id="newGame">New Game</button>
+    <button id="scorebutton">Scores</button> <button id="seepassportbutton">See Passport</button> <button id="newGame">New Game</button>
+    </dialog>
+
+    <dialog id="scoredialog">
+        <h3>Highscores</h3>
+        <table id="scoretable">
+        </table>
+        <span id="myscore"></span><br>
+        <button id="scorecancel">Close</button>
     </dialog>
 
     <div id="map"></div>
@@ -152,14 +160,15 @@
         <section id="smallinfo">
             <p id="p_name"></p>
             <p><span id="p_location"></span><span id="small-notification"></span></p>
+            <p><b>Score: </b><span id="p_score"></span><span id="score-notification"></span></p>
         </section>
         <section>
             <ul>
-                <li class="button1" id="travel_button"><img class="icon" src="image/reward.svg" alt="passport button">
+                <li class="button1" id="travel_button"><img class="bigicon" src="image/reward.svg" alt="passport button">
                 </li>
-                <li class="button2" id="openShopDialogButton"><img class="icon" src="image/shop.svg" alt="shop button">
+                <li class="button2" id="openShopDialogButton"><img class="bigicon" src="image/shop.svg" alt="shop button">
                 </li>
-                <li class="button3" id="openBankDialogButton"><img class="icon" src="image/piggy-bank.svg" alt="bank button"></li>
+                <li class="button3" id="openBankDialogButton"><img class="bigicon" src="image/piggy-bank.svg" alt="bank button"></li>
             </ul>
         </section>
         <section>Visited airports: <br><select id="visited_dropdown"></select></section>
@@ -169,6 +178,7 @@
     <button class="footerbutton" id="openHelpDialogButton">?</button>
     <button class="footerbutton" id="darkmodebtn">Dark Mode</button>
     <button class="footerbutton" id="restartbutton">New Game</button>
+    <button class="footerbutton" id="highscorebutton">High Scores</button>
 </footer>
 </body>
 </html>

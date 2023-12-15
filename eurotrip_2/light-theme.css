@@ -1,6 +1,6 @@
 body {
     font-family: 'Dhurjati', sans-serif;
-        background-color: #55BFE9;
+    background-color: #55BFE9;
 }
 
 main {
@@ -17,11 +17,19 @@ main {
     position: relative;
 }
 
+
 #stampAchievedDialog {
     color: black;
     width: fit-content;
     background-color: #FFD15C;
     border-color: #c99621;
+    text-align: center;
+}
+
+#stampAchievedDialog button {
+    background-color: #54C0EB;
+    border-color: #54C0EB;
+    color: black;
 }
 
 #stampAchievedDialog img {
@@ -45,7 +53,6 @@ ul {
     list-style-type: none;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
 }
 
 li {
@@ -111,9 +118,14 @@ h2 {
 }
 
 
-.icon {
+.bigicon {
     width: 50px;
     margin: 10px;
+}
+
+.smallicon {
+    width: 20px;
+    height: 20px;
 }
 
 .gameinfofield {
@@ -161,6 +173,13 @@ h2 {
     border: 0;
     background-color: transparent;
     box-shadow: none;
+    text-align: left;
+}
+
+#PassportDialog button {
+    background-color: #4473D9FF;
+    border-color: #4473D9FF;
+    color: white;
 }
 
 #passport {
@@ -219,6 +238,7 @@ dialog {
     background-color: white;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
+    text-align: center;
 }
 
 .cancel {
@@ -272,10 +292,22 @@ h4 {
     padding: 0;
 }
 
+#moreInformationDialog p {
+    display: inline;
+}
+
 b {
     color: #4473D9FF;
 }
 
 #smallinfo {
     font-size: large;
+}
+
+#scoretable {
+    width: 20vw;
+    text-align: left;
+}
+.tablenamelabel {
+    color: #FF7058;
 }

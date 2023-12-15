@@ -15,6 +15,8 @@ let cur_airport = start_airport
 let current_info = []
 let LoanTaken = 0
 let stamps = 0
+let player_score = 0
+let storyscoreswitch = false
 
 // creates map
 const map = L.map('map').setView([60.1699, 24.9384], 3);
@@ -44,6 +46,10 @@ async function FlyTo(range, money, loc) {
   document.querySelector('#stampfield').innerHTML = `${stamps}/5`
   const this_fetch = await fetch(`${url}/get_airport_info/${cur_airport}`)
   current_info = await this_fetch.json()
+  RemoveMarkers(markergroup)
+  const redMarker = L.marker([current_info['latitude_deg'], current_info['longitude_deg']], { icon: redIcon }).addTo(markergroup);
+  redMarker.bindPopup(`Current Location`);
+  ZoomToLocation(current_info['latitude_deg'], current_info['longitude_deg']);
   document.querySelector("#p_location").innerHTML = "<b>Current Location:</b> " + current_info['name']
   if (await GoalCheck(cur_airport) !== "win") {
       await ReCheck(cur_airport)
@@ -51,8 +57,13 @@ async function FlyTo(range, money, loc) {
       await PushpinsInRange(cur_airport, cur_range)
       ShowVisited()
       await fetch(`${url}/update_visited_status/${game_id}/${cur_airport}`)
-
   }
+}
+async function ZoomToLocation(latitude, longitude) {
+  map.flyTo([latitude, longitude], 5, {
+    duration: 1,  // Set the duration of the animation in seconds
+    animate: true,
+  });
 }
 
 // oli pakko tehdä erillinen funktio kauppaa ja pankkia varten, FlyTo tekee
@@ -133,6 +144,7 @@ nameform.addEventListener('submit', async function(evt){
   current_info = []
   LoanTaken = 0
   stamps = 0
+  scoreUpdate('green', 0, `Welcome, ${name}!`, 3000)
   await FlyTo(start_range, start_money, start_airport)
 });
 
@@ -149,6 +161,7 @@ async function GoalCheck(loc) {
     AddStamp(loc, stamps)
     document.querySelector('#stampfield').innerHTML = `${stamps}/5`
     if (stamps < 5){
+
       const achieved_dialog = document.querySelector('#stampAchievedDialog')
       const stampImage = document.querySelector('#stampImage');
       stampImage.src = `stamps/${current_info['municipality'].toLowerCase()}.png`;
@@ -159,12 +172,18 @@ async function GoalCheck(loc) {
       achieved_dialog.showModal()
     }
     if (stamps >= 5){
+      scoreUpdate('green', parseInt(cur_money) + parseInt(cur_range), `+${parseInt(cur_money) + parseInt(cur_range)} Leftover Money and Range Bonus`, 3000)
       const fireworksDialog = document.getElementById('fireworksDialog');
       fireworksDialog.showModal();
+      await fetch(`${url}/update_score/${game_id}/${player_score}`)
       const newGameAfterWin = document.getElementById('newGame');
       newGameAfterWin.addEventListener('click', function() {
         fireworksDialog.close()
         RestartGame()})
+      const scorebutton = document.querySelector('#scorebutton')
+      scorebutton.addEventListener('click', async function() {
+        await HighScoreView()
+      })
       return "win"
     }
   }
@@ -250,6 +269,7 @@ const cancelBuyButton2 = document.getElementById('cancelBuyButton2');
 
       if (!isNaN(rangeAmount) && rangeAmount > 0) {
         if (rangeAmount <= cur_money) {
+          rangeAmountDialog.close();
           const new_range = parseInt(cur_range) + rangeAmount
           const new_money = parseInt(cur_money) - rangeAmount
           await UpdateMoneyOrRange(new_range, new_money)
@@ -258,7 +278,6 @@ const cancelBuyButton2 = document.getElementById('cancelBuyButton2');
         else {
           alert('Not enough money!')
         }
-        rangeAmountDialog.close();
       } else {
         alert('Enter a valid amount.');
       }
@@ -299,7 +318,7 @@ confirmLoanButton.addEventListener('click', async function() {
   const LoanAmountInput = document.getElementById('LoanAmount');
   const LoanAmount = parseInt(LoanAmountInput.value, 10);
   if (!isNaN(LoanAmount) && LoanAmount > 0 && LoanAmount <= MaxLoanLeft) {
-    console.log('Taking loan of ' + LoanAmount + ' euros.');
+    scoreUpdate('red', -250, "-250 Use your money responsibly...", 3000)
     LoanTaken += LoanAmount
     MaxLoanLeft = MaxLoan - LoanTaken
     const new_money = parseInt(cur_money) + LoanAmount
@@ -347,7 +366,11 @@ const cancelStoryButton = document.getElementById('cancelButton3');
 const storyDialog = document.getElementById('storyDialog');
 
 storyButton.addEventListener('click', function(){
-  storyDialog.showModal();
+  if (!storyscoreswitch) {
+    scoreUpdate('green', 500, "+500 Enjoyed the EuroTrip Story", 7000)
+    storyscoreswitch = true
+  }
+    storyDialog.showModal();
 })
 
 cancelStoryButton.addEventListener('click', function(){
@@ -374,6 +397,7 @@ async function NoRangeLeft(loc, range) {
   const result = await response.json()
   console.log(result)
   if (result.length === 0){
+    await CheckGameOver()
     showAlert()
   }
 }
@@ -405,6 +429,10 @@ function showAlert(){
 
 // restart game function
 function RestartGame() {
+  player_score = 0
+  storyscoreswitch = false
+  MaxLoanLeft = MaxLoan
+  scoreUpdate('green', 0, '', 0)
   const listofdialogs = document.querySelectorAll('dialog')
   for (let i = 0; i < listofdialogs.length; i++) {
     listofdialogs[i].close()
@@ -445,6 +473,7 @@ document.querySelector('#travel_button').addEventListener('click', async functio
 });
 
 function AddStamp(loc, i) {
+  scoreUpdate('green', 500, "+500 Found stamp!", 3000)
   const totalSlots = 7;
   let nextSlot = i;
 
@@ -479,5 +508,49 @@ document.querySelector('#seepassportbutton').addEventListener('click', function(
 })
 
 document.querySelector('#openPassport').addEventListener('click', function(){
+  document.querySelector('#stampAchievedDialog').close()
   document.querySelector('#travel_button').click()
+})
+
+function scoreUpdate(color, amount, message, timeout) {
+  player_score = parseInt(player_score) + parseInt(amount)
+  document.querySelector('#p_score').innerHTML = player_score
+  if (color === "green") {
+    document.querySelector('#score-notification').style = 'color:#4CDBC4;'
+  }
+  else if (color === "red") {
+    document.querySelector('#score-notification').style = 'color:#FF7058;'
+  }
+  else {
+    document.querySelector('#score-notification').style = `color:${color};`
+  }
+    document.querySelector('#score-notification').innerHTML = ` ${message}`
+  setTimeout(function(){
+    document.querySelector('#score-notification').innerHTML = ``}, timeout)
+}
+
+async function HighScoreView() {
+  const scorefetch = await fetch(`${url}/high_scores`)
+        const scoreresult = await scorefetch.json()
+        const table = document.querySelector("#scoretable")
+        table.innerHTML = ''
+        for (let i = 0; i < scoreresult.length; i++) {
+          const name = scoreresult[i]["screen_name"]
+          const score = scoreresult[i]["score"]
+          const row = document.createElement("tr")
+          row.innerHTML = `<td class="tablenamelabel">${name}</td> <td>${score}</td>`
+          table.appendChild(row)
+        }
+
+        const scoredialog = document.querySelector('#scoredialog')
+        const cancelbutton = document.querySelector("#scorecancel")
+        cancelbutton.addEventListener('click', function() {scoredialog.close()})
+        const myscore = document.querySelector('#myscore')
+        myscore.innerHTML = `Your Score: ${player_score}`
+        scoredialog.showModal()
+}
+
+const footerscorebutton = document.querySelector('#highscorebutton')
+footerscorebutton.addEventListener('click', async function(){
+  await HighScoreView()
 })

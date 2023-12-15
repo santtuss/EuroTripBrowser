@@ -122,12 +122,13 @@ def check_which_re(game_id, location):
         return {"re_id": 0}
 
 
-
 # argumentit player name ja aloitussijainti
 # palauttaa automaattisesti luodun game id + päivittää databaseen uuden pelin tiedot
 # "game_id": g_id
+
 @app.route('/create_game/<p_name>/<start_location>')
 def create_game(p_name, start_location):
+    print("ok")
     sql = (f'''INSERT INTO game (money_budget, range_budget, location, screen_name, score)
     VALUES (2000, 1000, "{start_location}", "{p_name}", 0);''')
     cursor = conn.cursor(dictionary=True)
@@ -151,7 +152,6 @@ def create_game(p_name, start_location):
     sql = "DELETE FROM `encounter_location` WHERE `el_location` = 'EFHK';"
     cursor = conn.cursor(dictionary=True)
     cursor.execute(sql,)
-
     return {"game_id": g_id}
 
 
@@ -162,8 +162,7 @@ def create_game(p_name, start_location):
 def get_distance(current, target):
     start = get_airport_info(current)
     end = get_airport_info(target)
-    result_distance = distance.distance((start['latitude_deg'], start['longitude_deg']),
-                             (end['latitude_deg'], end['longitude_deg'])).km
+    result_distance = distance.distance((start['latitude_deg'], start['longitude_deg']),(end['latitude_deg'], end['longitude_deg'])).km
     return {"distance": result_distance}
 
 

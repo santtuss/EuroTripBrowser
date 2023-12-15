@@ -25,6 +25,12 @@ main {
     border-color: #c99621;
 }
 
+#stampAchievedDialog button {
+    background-color: black;
+    border-color: black;
+    color: white;
+}
+
 #stampAchievedDialog img {
     height: 90px;
     width: 90px;
@@ -46,7 +52,6 @@ ul {
     list-style-type: none;
     display: flex;
     justify-content: space-between;
-    padding: 10px;
 }
 
 li {
@@ -119,9 +124,14 @@ h2 {
     margin: -20px 0 0;
 }
 
-.icon {
+.bigicon {
     width: 50px;
     margin: 10px;
+}
+
+.smallicon {
+    width: 20px;
+    height: 20px;
 }
 
 .gameinfofield {
@@ -273,6 +283,10 @@ h4 {
     padding: 0;
 }
 
+#moreInformationDialog p {
+    display: inline;
+}
+
 b {
     color: white;
 }
@@ -283,4 +297,12 @@ b {
 
 .label {
     color: black;
+}
+
+#scoretable {
+    width: 20vw;
+    text-align: left;
+}
+.tablenamelabel {
+    color: #FF7058;
 }
